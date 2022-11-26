@@ -1,25 +1,25 @@
-import logo from './logo.svg';
-import './App.css';
+/* eslint-disable no-unused-vars */
+import React, { useState } from 'react'
+import { HashRouter, Route, Routes, Navigate } from 'react-router-dom'
+import Register from './routes/Register'
+import { AuthController } from './routes/Controller'
+import Main from './routes/Main'
+import './App.css'
 
-function App() {
+import io from 'socket.io-client'
+
+function App () {
+  const [hasRegister, setHasRegister] = useState(true)
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <HashRouter>
+      <Routes>
+          <Route path='/register' element={<Register/>} />
+          <Route element={<AuthController hasRegister={hasRegister}/>}>
+            <Route path='/' element={<Main/>}/>
+          </Route>
+      </Routes>
+    </HashRouter>
+  )
 }
 
-export default App;
+export default App
