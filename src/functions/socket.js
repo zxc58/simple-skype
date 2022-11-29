@@ -1,4 +1,4 @@
 import { io } from 'socket.io-client'
-const socket = io('http://localhost:3030')
-// socket
+const socket = io(process.env.REACT_APP_BACKEND)
+
 export default socket

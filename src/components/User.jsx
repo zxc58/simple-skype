@@ -1,11 +1,13 @@
 import React from 'react'
-
+import socket from '../functions/socket'
 export default function User (props) {
-  const { name, status } = props
+  const { name, id } = props
+  const invite = () => {
+    socket.emit('invite', id)
+  }
   return (
         <li>
-            <a className='user-name' >{name}</a>
-            {status === 'pending' ? <span className='pending'>P</span> : null}
+            <span className='user-name' onClick={invite}>{name}</span>
         </li>
   )
 }
