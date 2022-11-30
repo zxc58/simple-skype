@@ -1,5 +1,5 @@
-#my-video{
-    width: 200px;
-    height: 200px;
-    border-style: dashed;
+.videos{
+    max-width: 400px;
+    max-height: 400px;
+    /* border-style: dashed; */
 }
