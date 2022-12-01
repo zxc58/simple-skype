@@ -1,33 +1,39 @@
 /* eslint-disable no-unused-vars */
+
 import React, { useState, useContext, useEffect } from 'react'
 import List from '../components/List'
-import { myVideo } from '../functions/button'
-import { Button, Badge, Container, Row, Col } from 'react-bootstrap'
+import { Button, Badge, Container, Row, Col, Alert } from 'react-bootstrap'
 import '../CSS/main.css'
 import socket from '../functions/socket'
-// import Not from "";
-import Notice from '../components/Modal'
+import Modal from '../components/Modal'
+import { useEffectCreateRoom } from '../functions/useEffects'
+export const StatusContext = React.createContext()
 export default function Main (props) {
   const { name } = props
-  // const [modal, setModal] = useState(false)
-
+  const [isInRoom, setIsInRoom] = useState(false)
+  useEffectCreateRoom(isInRoom)
   return (
-    <Container>
-      <Row>
-        <Col sm={10} className='text-center'>
-          {/* {modal?</>:null} */}
-          <h1 >
-            {name}
-            {/* <Button variant="primary" onClick={myVideo} >Start</Button> */}
-          </h1>
-          <video className='videos' id='my-video' autoPlay ></video>
-          <br/>
-          <video className='videos' id='other-video' autoPlay ></video>
-        </Col>
-        <Col sm={2}>
-          <List/>
-        </Col>
-      </Row>
-    </Container>
+    <StatusContext.Provider isInRoom={isInRoom} setIsInRoom={setIsInRoom}>
+      <Container>
+        <Row >
+          <Col sm={5} className='bg-black video-col d-flex align-items-center border-end border-white'>
+            <div className='w-100 text-center'>
+              {!isInRoom
+                ? <Button size='lg' className='rounded-pill video-btn ' onClick={() => setIsInRoom(true)}>Start</Button>
+                : <video className='videos w-100' id='my-video' autoPlay ></video>
+              }
+            </div>
+          </Col>
+          <Col sm={5} className='bg-black video-col d-flex align-items-center  '>
+            <div className='w-100 text-center'>
+              <video className='videos w-100' id='other-video' autoPlay ></video>
+            </div>
+          </Col>
+          <Col sm={2} className='bg-light video-col'>
+            <List/>
+          </Col>
+        </Row>
+      </Container>
+    </StatusContext.Provider>
   )
 }

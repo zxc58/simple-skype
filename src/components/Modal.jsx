@@ -1,21 +1,19 @@
 import React from 'react'
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
-
+import '../CSS/modal.css'
 function Notice (props) {
-  const { user } = props
+  const { other, setOther } = props
   return (
-    <Modal.Dialog>
-      <Modal.Header closeButton>
-        <Modal.Title>You have an invite</Modal.Title>
-      </Modal.Header>
-
+    <Modal.Dialog className='Modal' size='lg'>
       <Modal.Body>
-        <p>{user.name}</p>
+        <p>
+          <span className='fs-3 text-danger'>{other.name}</span>
+          invites you a meet
+        </p>
       </Modal.Body>
-
       <Modal.Footer>
-        <Button variant="secondary">Reject</Button>
+        <Button variant="secondary" onClick={() => setOther(null)}>Reject</Button>
         <Button variant="primary">Accept</Button>
       </Modal.Footer>
     </Modal.Dialog>

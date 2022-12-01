@@ -1,0 +1,11 @@
+.Modal{
+    /* /* background-color: aquamarine; */
+    border-style: solid; 
+    z-index: 10;
+    position: absolute;
+    left: 0px;
+    top: 100px;
+    background-color: aqua;
+    opacity: 50%;
+
+}
