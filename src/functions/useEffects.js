@@ -1,41 +1,43 @@
+/* eslint-disable no-unused-vars */
 import { useEffect } from 'react'
 import { v4 as uuidv4 } from 'uuid'
-import socket from './socket'
+import socket, { onDisplay, onHide, createSignal } from './socket'
+import { createLocalStream } from './helpers'
+import pc from './peerConnection'
 
-export const useEffectCreateRoom = (isInRoom) => {
+let [localStream, remoteStream] = [null, null]
+
+export const createOrLeaveRoom = (isInRoom) => {
   useEffect(() => {
     if (isInRoom) {
       (async () => {
-        const constraints = { audio: true, video: true }
-        const stream = await navigator.mediaDevices.getUserMedia(constraints)
-        document.querySelector('#my-video').srcObject = stream
+        localStream = await createLocalStream()
+        // console.log(localStream)
+        document.getElementById('local-video').srcObject = localStream
         const roomId = uuidv4()
         socket.emit('createRoom', roomId)
+        pc.addStream(localStream)
+        createSignal(pc)(true)
+        // console.log(createSignal(true))
       })()
+    } else if (isInRoom === false) {
+      localStream.getTracks().forEach(track => track.stop())
+      document.getElementById('local-video').srcObject = null
+      socket.emit('leaveRoom')
     }
   }, [isInRoom])
 }
+
 export const useEffectOnInvite = () => {
 
 }
+
 export const useEffectUsers = (setUsers) => {
   useEffect(() => {
-    socket.on('display', (user) => {
-      setUsers(prevUsers => {
-        const i = prevUsers.find(e => e.id === user.id)
-        if (!i) {
-          return [...prevUsers, user]
-        } return [...prevUsers]
-      })
-    })
+    onDisplay({ setUsers })
+    onHide({ setUsers })
     socket.emit('getUsers', (response) => {
       setUsers(response.filter(e => e.id !== socket.id && e.name))
-    })
-    socket.on('hide', (userId) => {
-      setUsers(prevUsers => {
-        const newUsers = prevUsers.filter(e => e.id !== userId)
-        return newUsers
-      })
     })
   }, [])
 }

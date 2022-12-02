@@ -3,7 +3,7 @@ import React, { useState, userContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { InputGroup, Form, Button } from 'react-bootstrap'
 import { registerUser } from '../functions/event-listener'
-import '../CSS/register.css'
+import '../css/register.css'
 export default function Register (props) {
   const { setName } = props
   const navigate = useNavigate()

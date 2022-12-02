@@ -6,7 +6,7 @@
 // setMyVideo(true)
 // const constraints = { audio: true, video: true }
 // const stream = await navigator.mediaDevices.getUserMedia(constraints)
-// document.querySelector('#my-video').srcObject = stream
+// document.querySelector('#local-video').srcObject = stream
 // const roomId = uuidv4()
 // socket.emit('joinRoom', roomId)
 // }

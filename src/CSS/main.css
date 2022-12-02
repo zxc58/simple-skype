@@ -2,8 +2,7 @@
     border-style:solid;
     border-color: aliceblue;
     border-width: 1px;
-    /* max-width: inherit; */
-    /* max-height: inherit; */
+    width: 100%;
     display: inline-block;
 }
 .accept-button{

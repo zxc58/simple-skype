@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import User from './User'
 import socket from '../functions/socket'
 import { ListGroup } from 'react-bootstrap'

@@ -1,7 +1,7 @@
 import React from 'react'
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
-import '../CSS/modal.css'
+import '../css/modal.css'
 function Notice (props) {
   const { other, setOther } = props
   return (
