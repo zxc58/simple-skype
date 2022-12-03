@@ -1,9 +1,9 @@
-import pc from '../functions/peerConnection'
-import socket, { createSignal } from '../functions/socket'
-import { StatusContext } from '../routes/Main'
 import React, { useContext } from 'react'
 import { Button, Modal } from 'react-bootstrap'
-import { createLocalStream } from '../functions/helpers'
+import { socket, pc } from '../global/instance'
+import { createSignal } from '../global/events'
+import { StatusContext } from '../routes/Main'
+import { createLocalStream } from '../global/helpers'
 import '../css/modal.css'
 //
 function Notice (props) {
@@ -19,7 +19,7 @@ function Notice (props) {
           pc.addTrack(track)
         })
       })()
-      createSignal(pc)(true)
+      createSignal(true)
       setIsInRoom('inviting')
     })
   }

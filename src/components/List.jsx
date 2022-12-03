@@ -1,9 +1,7 @@
-/* eslint-disable no-unused-vars */
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState } from 'react'
 import User from './User'
-import socket from '../functions/socket'
 import { ListGroup } from 'react-bootstrap'
-import { usersSideEffect } from '../functions/useEffects'
+import { usersSideEffect } from '../hooks/effect'
 export default function List (props) {
   const [users, setUsers] = useState([])
   usersSideEffect(setUsers)

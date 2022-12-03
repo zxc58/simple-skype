@@ -1,11 +1,9 @@
-/* eslint-disable no-unused-vars */
 import { StatusContext } from '../routes/Main'
 import React, { useContext } from 'react'
-import socket from '../functions/socket'
-import { ListGroupItem, ListGroup } from 'react-bootstrap'
+import { socket } from '../global/instance'
+import { ListGroup } from 'react-bootstrap'
 export default function User (props) {
   const { user } = props
-  // const { isInRoom } = useContext(StatusContext)
   const invite = async () => {
     socket.emit('invite', user.id)
   }

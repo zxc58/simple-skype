@@ -1,16 +1,22 @@
-/* eslint-disable no-unused-vars */
-import React, { useState, userContext } from 'react'
+import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { InputGroup, Form, Button } from 'react-bootstrap'
-import { registerUser } from '../functions/event-listener'
+import { socket } from '../global/instance'
 import '../css/register.css'
 export default function Register (props) {
   const { setName } = props
   const navigate = useNavigate()
+  const registerUser = (e) => {
+    e.preventDefault()
+    const name = document.getElementById('name').value
+    socket.emit('register', name)
+    setName(name)
+    navigate('/')
+  }
   return (
     <>
       <h1 className='text-center'>Register</h1>
-      <form className='mt-3 text-center' id='register-form' onSubmit={registerUser(setName, navigate)}>
+      <form className='mt-3 text-center' id='register-form' onSubmit={registerUser}>
         <InputGroup className="mb-3">
           <Form.Control
             maxLength={10}

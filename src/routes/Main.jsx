@@ -4,7 +4,7 @@ import List from '../components/List'
 import Notice from '../components/Modal'
 import { Button, Container, Row, Col } from 'react-bootstrap'
 import '../css/main.css'
-import { roomSideEffect, modalSideEffect } from '../functions/useEffects'
+import { roomSideEffect, modalSideEffect } from '../hooks/effect'
 export const StatusContext = React.createContext()
 // state = pending,idling
 export default function Main (props) {
