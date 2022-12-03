@@ -1,26 +1,21 @@
 import { io } from 'socket.io-client'
-// import pc from './peerConnection'
-import { createLocalStream } from './helpers'
 const socket = io(process.env.REACT_APP_BACKEND)
 export default socket
 
-export const onInvite = (pc) => socket.on('invite', ({ name, roomId }) => {
-  // create madal that ask user weather join room
-  socket.emit('joinRoom', roomId, async () => {
-    // localStream = await createLocalStream()
-    document.getElementById('local-video').srcObject = (await createLocalStream())
-    createSignal(pc)(true)
-  })
+export const onInvite = ({ modal, setModal }) => socket.on('invite', ({ name, roomId }) => {
+
 })
 
 export const onPeerconnectSignaling = ({ pc }) => socket.on('peerconnectSignaling', async ({ desc, candidate }) => {
   // desc 指的是 Offer 與 Answer
   // currentRemoteDescription 代表的是最近一次連線成功的相關訊息
   if (desc && !pc.currentRemoteDescription) {
+    console.log('pc.setRemoteDescription')
     // eslint-disable-next-line no-undef
     await pc.setRemoteDescription(new RTCSessionDescription(desc))
     await createSignal(pc)(desc.type === 'answer')
   } else if (candidate) {
+    console.log('pc.addIceCandidate')
     // 新增對方 IP 候選位置
     // eslint-disable-next-line no-undef
     pc.addIceCandidate(new RTCIceCandidate(candidate))

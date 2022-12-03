@@ -1,20 +1,32 @@
-import React from 'react'
-import Button from 'react-bootstrap/Button'
-import Modal from 'react-bootstrap/Modal'
+/* eslint-disable no-unused-vars */
+import { createLocalStream } from '../functions/helpers'
+import pc from '../functions/peerConnection'
+import socket, { createSignal } from '../functions/socket'
+import { StatusContext } from '../routes/Main'
+import React, { useContext } from 'react'
+import { Button, Modal } from 'react-bootstrap'
 import '../css/modal.css'
+
 function Notice (props) {
-  const { other, setOther } = props
+  const { user: { name, roomId }, setModal } = props
+  const { setIsInRoom } = useContext(StatusContext)
+  const accept = () => {
+    socket.emit('joinRoom', roomId, async () => {
+      setIsInRoom('inviting')
+      createSignal(pc)(true)
+    })
+  }
   return (
-    <Modal.Dialog className='Modal' size='lg'>
+    <Modal.Dialog size='sm' className='invite-modal'>
       <Modal.Body>
-        <p>
-          <span className='fs-3 text-danger'>{other.name}</span>
+        <p className='mx-1'>
+          <span className='fs-3 text-danger'>{name + ' '}</span>
           invites you a meet
         </p>
       </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={() => setOther(null)}>Reject</Button>
-        <Button variant="primary">Accept</Button>
+      <Modal.Footer className='mx-1'>
+        <Button variant="secondary" onClick={() => setModal(null)}>Reject</Button>
+        <Button variant="primary" onClick={accept}>Accept</Button>
       </Modal.Footer>
     </Modal.Dialog>
   )
