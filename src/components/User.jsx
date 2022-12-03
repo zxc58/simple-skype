@@ -7,18 +7,25 @@ export default function User (props) {
   const { user } = props
   // const { isInRoom } = useContext(StatusContext)
   const invite = async () => {
-    socket.emit('invite', socket.id)
+    socket.emit('invite', user.id)
   }
-
-  return (
-    <>
+  const { isInRoom } = useContext(StatusContext)
+  if (isInRoom) {
+    return (
       <ListGroup.Item
-        className='text-center border border-secondary'
-        variant='primary' action onClick={invite}
+        className='text-center border border-secondary mb-1'
+        variant='success' action onClick={invite}
       >
         {user.name}
       </ListGroup.Item>
-      <br/>
-    </>
+    )
+  }
+  return (
+    <ListGroup.Item
+      className='text-center border border-secondary mb-1'
+      variant='danger'
+    >
+      {user.name}
+    </ListGroup.Item>
   )
 }

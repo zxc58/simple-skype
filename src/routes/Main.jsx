@@ -6,12 +6,12 @@ import { Button, Badge, Container, Row, Col, Alert } from 'react-bootstrap'
 import '../css/main.css'
 // import socket from '../functions/socket'
 // import Modal from '../components/Modal'
-import { createOrLeaveRoom } from '../functions/useEffects'
+import { roomSideEffect } from '../functions/useEffects'
 export const StatusContext = React.createContext()
 export default function Main (props) {
   const { name } = props
   const [isInRoom, setIsInRoom] = useState(null)
-  createOrLeaveRoom(isInRoom)
+  roomSideEffect(isInRoom)
   return (
     <StatusContext.Provider value={{ isInRoom, setIsInRoom }}>
       <Container>
@@ -29,7 +29,7 @@ export default function Main (props) {
             </div>
           </Col>
           <Col sm={2} className='bg-light video-col'>
-            {isInRoom ? <List/> : null}
+            <List/>
           </Col>
         </Row>
       </Container>
