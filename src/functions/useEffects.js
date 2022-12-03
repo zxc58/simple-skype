@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import socket, { onDisplay, onHide } from './socket'
 import { createLocalStream } from './helpers'
+// eslint-disable-next-line no-unused-vars
 import pc from './peerConnection'
 
 let [localStream] = [null, null]
@@ -21,7 +22,7 @@ export const roomSideEffect = (isInRoom) => useEffect(() => {
       document.getElementById('local-video').srcObject = localStream
       localStream.getTracks().forEach(track => {
         console.log('pc add track')
-        pc.addTrack(track)
+        // pc.addTrack(track)
       })
     })()
     if (isInRoom !== 'inviting') {

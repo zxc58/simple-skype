@@ -2,15 +2,11 @@ import { io } from 'socket.io-client'
 const socket = io(process.env.REACT_APP_BACKEND)
 export default socket
 
-export const onInvite = ({ modal, setModal }) => socket.on('invite', ({ name, roomId }) => {
-
-})
-
 export const onPeerconnectSignaling = ({ pc }) => socket.on('peerconnectSignaling', async ({ desc, candidate }) => {
   // desc 指的是 Offer 與 Answer
   // currentRemoteDescription 代表的是最近一次連線成功的相關訊息
   if (desc && !pc.currentRemoteDescription) {
-    console.log('pc.setRemoteDescription')
+    console.log('pc.setRemoteDescription' + desc.type)
     // eslint-disable-next-line no-undef
     await pc.setRemoteDescription(new RTCSessionDescription(desc))
     await createSignal(pc)(desc.type === 'answer')
@@ -36,7 +32,7 @@ export function createSignal (pc) {
         offerToReceiveVideo: 1 // 是否傳送影像流給對方
       }
       const offer = await pc[`create${isOffer ? 'Offer' : 'Answer'}`](signalOption)
-
+      console.log(isOffer ? 'Offer' : 'Answer')
       // 設定本地流配置
       await pc.setLocalDescription(offer)
       const desc = pc.localDescription

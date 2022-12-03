@@ -7,7 +7,7 @@ const configuration = {
     urls: 'stun:stun.l.google.com:19302' // Google's public STUN server
   }]
 }
-
+console.log('pc js file')
 // eslint-disable-next-line no-undef
 const pc = new RTCPeerConnection(configuration)
 pc.onicecandidate = ({ candidate }) => { // 當通過 RTCPeerConnection.setLocalDescription()方法更改本地描述之後icecandidate 事件

@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-import { createLocalStream } from '../functions/helpers'
 import pc from '../functions/peerConnection'
 import socket, { createSignal } from '../functions/socket'
 import { StatusContext } from '../routes/Main'
