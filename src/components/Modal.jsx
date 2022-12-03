@@ -3,15 +3,24 @@ import socket, { createSignal } from '../functions/socket'
 import { StatusContext } from '../routes/Main'
 import React, { useContext } from 'react'
 import { Button, Modal } from 'react-bootstrap'
+import { createLocalStream } from '../functions/helpers'
 import '../css/modal.css'
-
+//
 function Notice (props) {
   const { user: { name, roomId }, setModal } = props
   const { setIsInRoom } = useContext(StatusContext)
   const accept = () => {
     socket.emit('joinRoom', roomId, async () => {
-      setIsInRoom('inviting')
+      await (async () => {
+        const localStream = await createLocalStream()
+        document.getElementById('local-video').srcObject = localStream
+        localStream.getTracks().forEach(track => {
+          console.log('pc add track')
+          pc.addTrack(track)
+        })
+      })()
       createSignal(pc)(true)
+      setIsInRoom('inviting')
     })
   }
   return (

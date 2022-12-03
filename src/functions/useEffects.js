@@ -5,8 +5,6 @@ import { createLocalStream } from './helpers'
 // eslint-disable-next-line no-unused-vars
 import pc from './peerConnection'
 
-let [localStream] = [null, null]
-
 export const modalSideEffect = (setModal) => useEffect(() => {
   console.log('modal side effect')
   socket.on('invite', ({ name, roomId }) => {
@@ -16,23 +14,22 @@ export const modalSideEffect = (setModal) => useEffect(() => {
 
 export const roomSideEffect = (isInRoom) => useEffect(() => {
   console.log('room side effect')
-  if (isInRoom) {
+  if (isInRoom && isInRoom !== 'inviting') {
     (async () => {
-      localStream = await createLocalStream()
+      const localStream = await createLocalStream()
       document.getElementById('local-video').srcObject = localStream
       localStream.getTracks().forEach(track => {
         console.log('pc add track')
-        // pc.addTrack(track)
+        pc.addTrack(track)
       })
     })()
-    if (isInRoom !== 'inviting') {
-      const roomId = uuidv4()
-      socket.emit('joinRoom', roomId)
-    }
+    const roomId = uuidv4()
+    socket.emit('joinRoom', roomId)
   }
   if (isInRoom === false) { // 斷開連線時
-    localStream.getTracks().forEach(track => track.stop())
-    document.getElementById('local-video').srcObject = null
+    const localVideo = document.getElementById('local-video')
+    localVideo.srcObject.getTracks().forEach(track => track.stop())
+    localVideo.srcObject = null
     socket.emit('leaveRoom')
   }
 }, [isInRoom])

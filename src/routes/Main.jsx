@@ -6,7 +6,7 @@ import { Button, Container, Row, Col } from 'react-bootstrap'
 import '../css/main.css'
 import { roomSideEffect, modalSideEffect } from '../functions/useEffects'
 export const StatusContext = React.createContext()
-
+// state = pending,idling
 export default function Main (props) {
   const [isInRoom, setIsInRoom] = useState(null)
   const [modal, setModal] = useState(null)
