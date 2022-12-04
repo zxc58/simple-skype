@@ -7,7 +7,7 @@ export default function List (props) {
   usersSideEffect(setUsers)
   const usersComponents = users?.length ? users.map(e => <User key={e.id} user={e} />) : null
   return (
-    <ListGroup>
+    <ListGroup className='overflow-auto'>
       {usersComponents}
     </ListGroup>
   )

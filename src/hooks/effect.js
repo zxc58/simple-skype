@@ -1,27 +1,41 @@
 import { useEffect } from 'react'
-import { v4 as uuidv4 } from 'uuid'
-import { socket } from '../global/instance'
-import { onHide, onDisplay, onInvite, enableMyVideo } from '../global/events'
+import { socket, onHide, onDisplay, onInvite, enableMyVideo, createSignal } from '../global/instance'
 
-export const modalSideEffect = (setModal) => useEffect(() => {
+export const modalSideEffect = (setInvitation) => useEffect(() => {
   console.log('modal side effect')
-  onInvite({ setModal })
+  onInvite({ setInvitation })
 }, [])
 
-export const roomSideEffect = (isInRoom) => useEffect(() => {
+export const roomSideEffect = ({ roomId, invitation }) => useEffect(() => {
   console.log('room side effect')
-  if (isInRoom && isInRoom !== 'inviting') {
-    enableMyVideo()
-    const roomId = uuidv4()
-    socket.emit('joinRoom', roomId)
+  if (roomId) {
+    (async () => {
+      await enableMyVideo()
+      console.log('join room,invitation :  ')
+      console.log(invitation)
+      socket.emit('joinRoom', roomId, !invitation
+        ? undefined
+        : async () => {
+          console.log('accept invite')
+          await createSignal(true)
+        }
+      )
+    })()
   }
-  if (isInRoom === false) { // 斷開連線時
+  if (!roomId) {
     const localVideo = document.getElementById('local-video')
-    localVideo.srcObject.getTracks().forEach(track => track.stop())
-    localVideo.srcObject = null
-    socket.emit('leaveRoom')
+    const remoteVideo = document.getElementById('remote-video')
+    if (localVideo.srcObject) {
+      socket.emit('leaveRoom')
+      localVideo.srcObject.getTracks().forEach(track => track.stop())
+      localVideo.srcObject = null
+    }
+    if (remoteVideo.srcObject) {
+      remoteVideo.srcObject.getTracks().forEach(track => track.stop())
+      remoteVideo.srcObject = null
+    }
   }
-}, [isInRoom])
+}, [roomId])
 
 export const usersSideEffect = (setUsers) => useEffect(() => {
   onDisplay({ setUsers })

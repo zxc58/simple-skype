@@ -7,8 +7,8 @@ export default function User (props) {
   const invite = async () => {
     socket.emit('invite', user.id)
   }
-  const { isInRoom } = useContext(StatusContext)
-  if (isInRoom) {
+  const { roomId } = useContext(StatusContext)
+  if (roomId) {
     return (
       <ListGroup.Item
         className='text-center border border-secondary mb-1'

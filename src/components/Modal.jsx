@@ -1,28 +1,18 @@
 import React, { useContext } from 'react'
 import { Button, Modal } from 'react-bootstrap'
-import { socket, pc } from '../global/instance'
-import { createSignal } from '../global/events'
 import { StatusContext } from '../routes/Main'
-import { createLocalStream } from '../global/helpers'
 import '../css/modal.css'
 //
-function Notice (props) {
-  const { user: { name, roomId }, setModal } = props
-  const { setIsInRoom } = useContext(StatusContext)
-  const accept = () => {
-    socket.emit('joinRoom', roomId, async () => {
-      await (async () => {
-        const localStream = await createLocalStream()
-        document.getElementById('local-video').srcObject = localStream
-        localStream.getTracks().forEach(track => {
-          console.log('pc add track')
-          pc.addTrack(track)
-        })
-      })()
-      createSignal(true)
-      setIsInRoom('inviting')
-    })
+function Invitation (props) {
+  const { user: { name, roomId }, setInvitation } = props
+  const { setRoomId } = useContext(StatusContext)
+  const eventHandler = {
+    accept: () => {
+      setRoomId(roomId)
+    },
+    reject: () => setInvitation(null)
   }
+
   return (
     <Modal.Dialog size='sm' className='invite-modal'>
       <Modal.Body>
@@ -32,11 +22,11 @@ function Notice (props) {
         </p>
       </Modal.Body>
       <Modal.Footer className='mx-1'>
-        <Button variant="secondary" onClick={() => setModal(null)}>Reject</Button>
-        <Button variant="primary" onClick={accept}>Accept</Button>
+        <Button variant="secondary" onClick={eventHandler.reject}>Reject</Button>
+        <Button variant="primary" onClick={eventHandler.accept}>Accept</Button>
       </Modal.Footer>
     </Modal.Dialog>
   )
 }
 
-export default Notice
+export default Invitation
