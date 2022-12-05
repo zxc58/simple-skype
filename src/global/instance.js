@@ -1,42 +1,38 @@
+/* eslint-disable no-unused-vars */
 import { createLocalStream } from './helpers'
 import { io } from 'socket.io-client'
-const configuration = {
-  iceServers: [{
-    urls: 'stun:stun.l.google.com:19302' // Google's public STUN server
-  }]
-}
-// eslint-disable-next-line no-undef
+//
+let pc
 export const socket = io(process.env.REACT_APP_BACKEND)
-
-// eslint-disable-next-line no-undef
-export const pc = new RTCPeerConnection(configuration)
-
 //
-
-pc.onicecandidate = ({ candidate }) => { // 當通過 RTCPeerConnection.setLocalDescription()方法更改本地描述之後icecandidate 事件
-  if (!candidate) { return }
-  console.log('Emit candidate: ' + candidate.toString())
-  socket.emit('peerconnectSignaling', { candidate })
-}
-// The track event is sent to the ontrack event handler on RTCPeerConnections
-// after a new track has been added to an RTCRtpReceiver which is part of the connection.
-pc.addEventListener('track', ({ track }) => {
-  if (!track) { return }
-  const remoteVideo = document.getElementById('remote-video')
-  if (!remoteVideo.srcObject) {
-    // eslint-disable-next-line no-undef
-    remoteVideo.srcObject = new MediaStream()
+export function initPc () {
+  if (pc) { pc.close() }
+  const configuration = {
+    iceServers: [{
+      urls: 'stun:stun.l.google.com:19302' // Google's public STUN server
+    }]
   }
-  remoteVideo.srcObject.addTrack(track)
-}, false)
-
+  // eslint-disable-next-line no-undef
+  pc = new RTCPeerConnection(configuration)
+  pc.onicecandidate = ({ candidate }) => { // 當通過 RTCPeerConnection.setLocalDescription()方法更改本地描述之後icecandidate 事件
+    if (!candidate) { return }
+    socket.emit('peerconnectSignaling', { candidate })
+  }
+  pc.ontrack = ({ track }) => {
+    if (!track) { return }
+    const remoteVideo = document.getElementById('remote-video')
+    if (!remoteVideo.srcObject) {
+      // eslint-disable-next-line no-undef
+      remoteVideo.srcObject = new MediaStream()
+    }
+    remoteVideo.srcObject.addTrack(track)
+  }
+}
 //
-
 socket.on('peerconnectSignaling', async ({ desc, candidate }) => {
   // desc 指的是 Offer 與 Answer
   // currentRemoteDescription 代表的是最近一次連線成功的相關訊息
-  if (desc && !pc.currentRemoteDescription) { // && !pc.currentRemoteDescription
-    console.log('pc.setRemoteDescription: ' + desc.type)
+  if (desc && !pc.currentRemoteDescription) {
     // eslint-disable-next-line no-undef
     await pc.setRemoteDescription(new RTCSessionDescription(desc))
     await createSignal(desc.type === 'answer')
@@ -45,33 +41,40 @@ socket.on('peerconnectSignaling', async ({ desc, candidate }) => {
     await pc.addIceCandidate(new RTCIceCandidate(candidate))
   }
 })
-
-//
-export const enableMyVideo = async () => {
-  if (pc.getSenders().length === 2) {
-    return
-  }
-  const localStream = await createLocalStream()
-  document.getElementById('local-video').srcObject = localStream
-  console.log(pc.getReceivers())
-  localStream.getTracks().forEach(track => {
-    console.log('pc add track(video and audio)')
+socket.on('leaveRoom', (leaverId) => {
+  disableRemoteVideo()
+  const localVideo = document.getElementById('local-video')
+  initPc()
+  localVideo.srcObject.getTracks().forEach(track => {
     pc.addTrack(track)
   })
-  console.log(pc.getSenders())
+})
+//
+export const enableMyVideo = async () => {
+  try {
+    const localVideo = document.getElementById('local-video')
+    if (localVideo.srcObject) { throw new Error('Local video exsit') }
+    const localStream = await createLocalStream()
+    localVideo.srcObject = localStream
+    localStream.getTracks().forEach(track => {
+      pc.addTrack(track)
+    })
+  } catch (error) {
+    console.error(error)
+  }
 }
 
 export const onInvite = ({ setInvitation }) => socket.on('invite', ({ name, roomId }) => {
   setInvitation({ name, roomId })
 })
-export const onDisplay = ({ setUsers }) =>
-  socket.on('display', (user) => {
-    setUsers(prevUsers => {
-      const i = prevUsers.find(e => e.id === user.id)
-      if (!i) { return [...prevUsers, user] }
-      return [...prevUsers]
-    })
+
+export const onDisplay = ({ setUsers }) => socket.on('display', (user) => {
+  setUsers(prevUsers => {
+    const i = prevUsers.find(e => e.id === user.id)
+    if (!i) { return [...prevUsers, user] }
+    return [...prevUsers]
   })
+})
 
 export const onHide = ({ setUsers }) => socket.on('hide', (userId) => {
   setUsers(prevUsers => {
@@ -93,7 +96,6 @@ export async function createSignal (isOffer) {
       offerToReceiveVideo: 1 // 是否傳送影像流給對方
     }
     const offer = await pc[`create${isOffer ? 'Offer' : 'Answer'}`](signalOption)
-    console.log(isOffer ? 'Offer' : 'Answer')
     // 設定本地流配置
     await pc.setLocalDescription(offer)
     const desc = pc.localDescription
@@ -101,4 +103,11 @@ export async function createSignal (isOffer) {
   } catch (err) {
     console.log(err)
   }
+}
+
+export function disableRemoteVideo () {
+  const remoteVideo = document.getElementById('remote-video')
+  if (!remoteVideo.srcObject) { console.error('Remote video do not exsit') }
+  remoteVideo.srcObject.getTracks().forEach(track => track.stop())
+  remoteVideo.srcObject = null
 }
