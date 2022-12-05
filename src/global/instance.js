@@ -30,12 +30,10 @@ export function initPc () {
 }
 //
 socket.on('peerconnectSignaling', async ({ desc, candidate }) => {
-  // desc 指的是 Offer 與 Answer
-  // currentRemoteDescription 代表的是最近一次連線成功的相關訊息
   if (desc && !pc.currentRemoteDescription) {
     // eslint-disable-next-line no-undef
     await pc.setRemoteDescription(new RTCSessionDescription(desc))
-    await createSignal(desc.type === 'answer')
+    if (!(desc.type === 'Answer')) { await createSignal('Answer') }
   } else if (candidate) {
     // eslint-disable-next-line no-undef
     await pc.addIceCandidate(new RTCIceCandidate(candidate))
@@ -43,8 +41,8 @@ socket.on('peerconnectSignaling', async ({ desc, candidate }) => {
 })
 socket.on('leaveRoom', (leaverId) => {
   disableRemoteVideo()
-  const localVideo = document.getElementById('local-video')
   initPc()
+  const localVideo = document.getElementById('local-video')
   localVideo.srcObject.getTracks().forEach(track => {
     pc.addTrack(track)
   })
@@ -84,18 +82,12 @@ export const onHide = ({ setUsers }) => socket.on('hide', (userId) => {
 })
 
 //
-
-export async function createSignal (isOffer) {
+export async function createSignal (type) {
   try {
-    if (!pc) {
-      return
-    }
+    if (!pc || !(type === 'Answer' || type === 'Offer')) { return }
     // 呼叫 peerConnect 內的 createOffer / createAnswer
-    const signalOption = {
-      offerToReceiveAudio: 1, // 是否傳送聲音流給對方
-      offerToReceiveVideo: 1 // 是否傳送影像流給對方
-    }
-    const offer = await pc[`create${isOffer ? 'Offer' : 'Answer'}`](signalOption)
+    const signalOption = { offerToReceiveAudio: 1, offerToReceiveVideo: 1 }
+    const offer = await pc[`create${type}`](signalOption)
     // 設定本地流配置
     await pc.setLocalDescription(offer)
     const desc = pc.localDescription
@@ -107,7 +99,7 @@ export async function createSignal (isOffer) {
 
 export function disableRemoteVideo () {
   const remoteVideo = document.getElementById('remote-video')
-  if (!remoteVideo.srcObject) { console.error('Remote video do not exsit') }
+  if (!remoteVideo.srcObject) { return }
   remoteVideo.srcObject.getTracks().forEach(track => track.stop())
   remoteVideo.srcObject = null
 }

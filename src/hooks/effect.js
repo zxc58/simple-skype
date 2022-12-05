@@ -12,7 +12,7 @@ export const roomSideEffect = ({ roomId, invitation }) => useEffect(() => {
       socket.emit('joinRoom', roomId, !invitation
         ? undefined
         : async () => {
-          await createSignal(true)
+          await createSignal('Offer')
         }
       )
     })()
