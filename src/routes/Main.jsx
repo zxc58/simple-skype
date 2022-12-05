@@ -27,16 +27,17 @@ export default function Main (props) {
           <Col sm={5} className='bg-black video-col d-flex align-items-center border-end border-white'>
             <div className='w-100 text-center'>
               <Button size='lg' className={!roomId ? 'rounded-pill' : 'd-none'} onClick={eventHandler.start}>Start</Button>
-              <video className={roomId ? 'videos' : 'd-none'} id='local-video' autoPlay ></video><br/>
+              <video className={roomId ? 'videos' : 'd-none'} id='local-video' autoPlay ></video>
               <Button size='lg' variant='danger' className={roomId ? 'rounded-circle' : 'd-none'} onClick={eventHandler.leave}>Leave</Button>
             </div>
           </Col>
           <Col sm={5} className='bg-black video-col d-flex align-items-center  '>
             <div className='w-100 text-center'>
+              <p className='text-white fs-1'>{!roomId ? 'Press start and invite user' : null}</p>
               <video className='videos' id='remote-video' autoPlay ></video>
             </div>
           </Col>
-          <Col sm={2} className='bg-light video-col'>
+          <Col sm={2} className='px-0 bg-light video-col'>
             <List/>
           </Col>
         </Row>

@@ -1,7 +1,5 @@
 .videos{
-    border-style:solid;
-    border-color: aliceblue;
-    border-width: 1px;
+
     width: 100%;
     display: inline-block;
 }

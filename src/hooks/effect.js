@@ -21,8 +21,7 @@ export const roomSideEffect = ({ roomId, invitation }) => useEffect(() => {
         }
       )
     })()
-  }
-  if (!roomId) {
+  } else {
     const localVideo = document.getElementById('local-video')
     const remoteVideo = document.getElementById('remote-video')
     if (localVideo.srcObject) {

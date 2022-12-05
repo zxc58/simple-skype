@@ -4,15 +4,18 @@ import { socket } from '../global/instance'
 import { ListGroup } from 'react-bootstrap'
 export default function User (props) {
   const { user } = props
-  const invite = async () => {
-    socket.emit('invite', user.id)
-  }
   const { roomId } = useContext(StatusContext)
+  const eventHandler = {
+    invite: () => {
+      socket.emit('invite', user.id)
+    }
+  }
+
   if (roomId) {
     return (
       <ListGroup.Item
         className='text-center border border-secondary mb-1'
-        variant='success' action onClick={invite}
+        variant='success' action onClick={eventHandler.invite}
       >
         {user.name}
       </ListGroup.Item>

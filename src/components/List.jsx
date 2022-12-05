@@ -7,8 +7,11 @@ export default function List (props) {
   usersSideEffect(setUsers)
   const usersComponents = users?.length ? users.map(e => <User key={e.id} user={e} />) : null
   return (
-    <ListGroup className='overflow-auto'>
-      {usersComponents}
-    </ListGroup>
+    <>
+      <h5 className='text-center text-white bg-primary py-1'>Users</h5>
+      <ListGroup className='overflow-auto'>
+        {usersComponents}
+      </ListGroup>
+    </>
   )
 }
