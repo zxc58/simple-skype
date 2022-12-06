@@ -67,11 +67,7 @@ export const onInvite = ({ setInvitation }) => socket.on('invite', ({ name, room
 })
 
 export const onDisplay = ({ setUsers }) => socket.on('display', (user) => {
-  setUsers(prevUsers => {
-    const i = prevUsers.find(e => e.id === user.id)
-    if (!i) { return [...prevUsers, user] }
-    return [...prevUsers]
-  })
+  setUsers(prevUsers => [...prevUsers, { ...user, isBusy: false }])
 })
 
 export const onHide = ({ setUsers }) => socket.on('hide', (userId) => {
@@ -81,6 +77,13 @@ export const onHide = ({ setUsers }) => socket.on('hide', (userId) => {
   })
 })
 
+export const onToggleBusy = ({ setUsers }) => socket.on('toggleBusy', (userId) => {
+  setUsers(prevUsers => {
+    const user = prevUsers.find(e => e.id === userId)
+    user.isBusy = !user.isBusy
+    return [...prevUsers]
+  })
+})
 //
 export async function createSignal (type) {
   try {

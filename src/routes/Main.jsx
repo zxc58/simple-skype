@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import List from '../components/List'
-import Invitation from '../components/Modal'
+import Invitation from '../components/Invitation'
 import { Button, Container, Row, Col } from 'react-bootstrap'
 import '../css/main.css'
 import { roomSideEffect, modalSideEffect } from '../hooks/effect'
@@ -21,7 +21,7 @@ export default function Main (props) {
   }
 
   return (
-    <StatusContext.Provider value={{ roomId, setRoomId }}>
+    <StatusContext.Provider value={{ roomId, setRoomId, start: eventHandler.start }}>
       <Container>
         <Row>
           <Col sm={5} className='bg-black video-col d-flex align-items-center border-end border-white'>
@@ -33,7 +33,7 @@ export default function Main (props) {
           </Col>
           <Col sm={5} className='bg-black video-col d-flex align-items-center  '>
             <div className='w-100 text-center'>
-              <p className='text-white fs-1'>{!roomId ? 'Press start and invite user' : null}</p>
+              <p className={!roomId ? 'text-white fs-1' : 'd-none'}>Press start and invite user</p>
               <video className='videos' id='remote-video' autoPlay ></video>
             </div>
           </Col>

@@ -1,17 +1,20 @@
-import { StatusContext } from '../routes/Main'
-import React, { useContext } from 'react'
+import React from 'react'
 import { socket } from '../global/instance'
 import { ListGroup } from 'react-bootstrap'
 export default function User (props) {
+  const { start } = props
   const { user } = props
-  const { roomId } = useContext(StatusContext)
   const eventHandler = {
     invite: () => {
+      if (document.getElementById('remote-video').srcObject) { return }
+      // if (!document.getElementById('local-video').srcObject) {
+      //   start()
+      // }
       socket.emit('invite', user.id)
     }
   }
 
-  if (roomId) {
+  if (!user.isBusy) {
     return (
       <ListGroup.Item
         className='text-center border border-secondary mb-1'

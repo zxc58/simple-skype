@@ -1,6 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { InputGroup, Form, Button } from 'react-bootstrap'
+import { InputGroup, Form, Button, Container } from 'react-bootstrap'
 import { socket } from '../global/instance'
 import '../css/register.css'
 export default function Register (props) {
@@ -14,7 +14,7 @@ export default function Register (props) {
     navigate('/')
   }
   return (
-    <>
+    <Container>
       <h1 className='text-center'>Register</h1>
       <form className='mt-3 text-center' id='register-form' onSubmit={registerUser}>
         <InputGroup className="mb-3">
@@ -30,6 +30,6 @@ export default function Register (props) {
           </Button>
         </InputGroup>
       </form>
-    </>
+    </Container>
   )
 }

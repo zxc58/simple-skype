@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { disableRemoteVideo, initPc, socket, onHide, onDisplay, onInvite, enableMyVideo, createSignal } from '../global/instance'
+import { disableRemoteVideo, initPc, socket, onHide, onDisplay, onInvite, enableMyVideo, createSignal, onToggleBusy } from '../global/instance'
 
 export const modalSideEffect = (setInvitation) => useEffect(() => {
   onInvite({ setInvitation })
@@ -9,12 +9,7 @@ export const roomSideEffect = ({ roomId, invitation }) => useEffect(() => {
   if (roomId) {
     (async () => {
       await enableMyVideo()
-      socket.emit('joinRoom', roomId, !invitation
-        ? undefined
-        : async () => {
-          await createSignal('Offer')
-        }
-      )
+      socket.emit('joinRoom', roomId, invitation ? async () => await createSignal('Offer') : undefined)
     })()
   } else {
     initPc()
@@ -31,7 +26,8 @@ export const roomSideEffect = ({ roomId, invitation }) => useEffect(() => {
 export const usersSideEffect = (setUsers) => useEffect(() => {
   onDisplay({ setUsers })
   onHide({ setUsers })
+  onToggleBusy({ setUsers })
   socket.emit('getUsers', (response) => {
-    setUsers(response.filter(e => e.id !== socket.id && e.name && !e.isBusy))
+    setUsers(response.filter(e => e.id !== socket.id && e.name))
   })
 }, [])
