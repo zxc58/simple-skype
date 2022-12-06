@@ -33,7 +33,7 @@ socket.on('peerconnectSignaling', async ({ desc, candidate }) => {
   if (desc && !pc.currentRemoteDescription) {
     // eslint-disable-next-line no-undef
     await pc.setRemoteDescription(new RTCSessionDescription(desc))
-    if (!(desc.type === 'Answer')) { await createSignal('Answer') }
+    if (!(desc.type === 'answer')) { await createSignal('Answer') }
   } else if (candidate) {
     // eslint-disable-next-line no-undef
     await pc.addIceCandidate(new RTCIceCandidate(candidate))
@@ -62,8 +62,8 @@ export const enableMyVideo = async () => {
   }
 }
 
-export const onInvite = ({ setInvitation }) => socket.on('invite', ({ name, roomId }) => {
-  setInvitation({ name, roomId })
+export const onInvite = ({ setInvitation }) => socket.on('invite', ({ inviterName, room }) => {
+  setInvitation({ inviterName, room })
 })
 
 export const onDisplay = ({ setUsers }) => socket.on('display', (user) => {

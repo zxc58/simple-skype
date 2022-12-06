@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
+import { createRoom } from '../global/helpers'
 import List from '../components/List'
 import Invitation from '../components/Invitation'
 import { Button, Container, Row, Col } from 'react-bootstrap'
@@ -8,32 +9,32 @@ import '../css/main.css'
 import { roomSideEffect, modalSideEffect } from '../hooks/effect'
 export const StatusContext = React.createContext()
 export default function Main (props) {
-  const [roomId, setRoomId] = useState(false)
+  const [room, setRoom] = useState(null)
   const [invitation, setInvitation] = useState(null)
-  roomSideEffect({ roomId, invitation })
+  roomSideEffect({ room, invitation })
   modalSideEffect(setInvitation)
   const eventHandler = {
-    start: () => setRoomId(uuidv4()),
+    start: () => setRoom(createRoom()),
     leave: () => {
-      setRoomId(null)
+      setRoom(null)
       setInvitation(null)
     }
   }
 
   return (
-    <StatusContext.Provider value={{ roomId, setRoomId, start: eventHandler.start }}>
+    <StatusContext.Provider value={{ room, setRoom, start: eventHandler.start }}>
       <Container>
         <Row>
           <Col sm={5} className='bg-black video-col d-flex align-items-center border-end border-white'>
             <div className='w-100 text-center'>
-              <Button size='lg' className={!roomId ? 'rounded-pill' : 'd-none'} onClick={eventHandler.start}>Start</Button>
-              <video className={roomId ? 'videos' : 'd-none'} id='local-video' autoPlay ></video>
-              <Button size='lg' variant='danger' className={roomId ? 'rounded-circle' : 'd-none'} onClick={eventHandler.leave}>Leave</Button>
+              <Button size='lg' className={!room ? 'rounded-pill' : 'd-none'} onClick={eventHandler.start}>Start</Button>
+              <video className={room ? 'videos' : 'd-none'} id='local-video' autoPlay ></video>
+              <Button size='lg' variant='danger' className={room ? 'rounded-circle' : 'd-none'} onClick={eventHandler.leave}>Leave</Button>
             </div>
           </Col>
           <Col sm={5} className='bg-black video-col d-flex align-items-center  '>
             <div className='w-100 text-center'>
-              <p className={!roomId ? 'text-white fs-1' : 'd-none'}>Press start and invite user</p>
+              <p className={!room ? 'text-white fs-1' : 'd-none'}>Click user to invite.</p>
               <video className='videos' id='remote-video' autoPlay ></video>
             </div>
           </Col>
@@ -42,7 +43,7 @@ export default function Main (props) {
           </Col>
         </Row>
       </Container>
-      {invitation && !roomId ? <Invitation user={invitation} setInvitation={setInvitation}/> : null}
+      {invitation && !room ? <Invitation invitation={invitation} setInvitation={setInvitation}/> : null}
     </StatusContext.Provider>
   )
 }

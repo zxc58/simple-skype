@@ -5,11 +5,15 @@ export const modalSideEffect = (setInvitation) => useEffect(() => {
   onInvite({ setInvitation })
 }, [])
 
-export const roomSideEffect = ({ roomId, invitation }) => useEffect(() => {
-  if (roomId) {
+export const roomSideEffect = ({ room, invitation }) => useEffect(() => {
+  if (room) {
+    const { createRoomCallback } = room;
     (async () => {
       await enableMyVideo()
-      socket.emit('joinRoom', roomId, invitation ? async () => await createSignal('Offer') : undefined)
+      socket.emit('joinRoom', room, invitation
+        ? async () => await createSignal('Offer')
+        : (room) => { if (createRoomCallback) { createRoomCallback(room) } }
+      )
     })()
   } else {
     initPc()
@@ -21,7 +25,7 @@ export const roomSideEffect = ({ roomId, invitation }) => useEffect(() => {
       localVideo.srcObject = null
     }
   }
-}, [roomId])
+}, [room])
 
 export const usersSideEffect = (setUsers) => useEffect(() => {
   onDisplay({ setUsers })

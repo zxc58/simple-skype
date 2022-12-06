@@ -1,28 +1,29 @@
 import React, { useContext } from 'react'
 import { Button, Modal } from 'react-bootstrap'
 import { StatusContext } from '../routes/Main'
-import '../css/modal.css'
+import '../css/invitation.css'
 //
 function Invitation (props) {
-  const { user: { name, roomId }, setInvitation } = props
-  const { setRoomId } = useContext(StatusContext)
+  const { invitation, setInvitation } = props
+  const { inviterName, room } = invitation
+  const { setRoom } = useContext(StatusContext)
   const eventHandler = {
     accept: () => {
-      setRoomId(roomId)
+      setRoom(room)
     },
     reject: () => setInvitation(null)
   }
 
   return (
-    <Modal.Dialog size='sm' className='invite-modal'>
+    <Modal.Dialog size='sm' className='invitation-modal'>
       <Modal.Body>
-        <p className='mx-1'>
-          <span className='fs-3 text-danger'>{name + ' '}</span>
+        <p className='mx-6'>
+          <span className='fs-3 text-danger'>{`${inviterName} `}</span>
           invites you a meet
         </p>
       </Modal.Body>
-      <Modal.Footer className='mx-1'>
-        <Button variant="secondary" onClick={eventHandler.reject}>Reject</Button>
+      <Modal.Footer className='my-1'>
+        <Button variant="secondary" className='me-1' onClick={eventHandler.reject}>Reject</Button>
         <Button variant="primary" onClick={eventHandler.accept}>Accept</Button>
       </Modal.Footer>
     </Modal.Dialog>

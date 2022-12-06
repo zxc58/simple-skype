@@ -1,35 +1,34 @@
-import React from 'react'
+import { createRoom } from '../global/helpers'
+import { StatusContext } from '../routes/Main'
+import React, { useContext } from 'react'
 import { socket } from '../global/instance'
-import { ListGroup } from 'react-bootstrap'
+import { Button } from 'react-bootstrap'
 export default function User (props) {
-  const { start } = props
   const { user } = props
+  const { room, setRoom } = useContext(StatusContext)
   const eventHandler = {
     invite: () => {
       if (document.getElementById('remote-video').srcObject) { return }
-      // if (!document.getElementById('local-video').srcObject) {
-      //   start()
-      // }
-      socket.emit('invite', user.id)
+      if (!room) {
+        const roomConfig = createRoom()
+        roomConfig.createRoomCallback = (room) => {
+          const data = { room, invitingId: user.id }
+          delete data.room.createRoomCallback
+          socket.emit('invite', data)
+        }
+        return setRoom(roomConfig)
+      }
+      socket.emit('invite', { room, invitingId: user.id })
     }
   }
 
-  if (!user.isBusy) {
-    return (
-      <ListGroup.Item
-        className='text-center border border-secondary mb-1'
-        variant='success' action onClick={eventHandler.invite}
-      >
-        {user.name}
-      </ListGroup.Item>
-    )
-  }
   return (
-    <ListGroup.Item
-      className='text-center border border-secondary mb-1'
-      variant='danger'
+    <Button className='my-1'
+      variant={!user.isBusy ? 'success' : 'danger'}
+      disabled={user.isBusy}
+      onClick={!user.isBusy ? eventHandler.invite : null}
     >
       {user.name}
-    </ListGroup.Item>
+    </Button>
   )
 }
