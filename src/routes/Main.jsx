@@ -24,6 +24,9 @@ export default function Main (props) {
     <StatusContext.Provider value={{ name, room, setRoom, start: eventHandler.start }}>
       <Container>
         <Row>
+          <Col sm={2} className='px-0 bg-light video-col border-end'>
+            <List/>
+          </Col>
           <Col sm={5} className='bg-black video-col d-flex align-items-center border-end border-white'>
             <div className='w-100 text-center'>
               <Button size='lg' className={!room ? 'rounded-pill' : 'd-none'} onClick={eventHandler.start}>Start</Button>
@@ -36,9 +39,6 @@ export default function Main (props) {
               <p className={!room ? 'text-white fs-1' : 'd-none'}>Click user to invite.</p>
               <video className='videos' id='remote-video' autoPlay ></video>
             </div>
-          </Col>
-          <Col sm={2} className='px-0 bg-light video-col'>
-            <List/>
           </Col>
         </Row>
       </Container>
