@@ -1,24 +1,22 @@
-import { createRoom } from '../global/helpers'
+import { createRoom, createInvitation } from '../global/helpers'
 import { StatusContext } from '../routes/Main'
 import React, { useContext } from 'react'
 import { socket } from '../global/instance'
 import { Button } from 'react-bootstrap'
+
 export default function User (props) {
   const { user } = props
-  const { room, setRoom } = useContext(StatusContext)
+  const { name, room, setRoom } = useContext(StatusContext)
   const eventHandler = {
     invite: () => {
       if (document.getElementById('remote-video').srcObject) { return }
-      if (!room) {
-        const roomConfig = createRoom()
-        roomConfig.createRoomCallback = (room) => {
-          const data = { room, invitingId: user.id }
-          delete data.room.createRoomCallback
-          socket.emit('invite', data)
-        }
+      if (!room) { // create room and invite
+        const otherAttributes = { invitingId: user.id, invitingName: user.name, inviterName: name, inviterId: socket.id }
+        const roomConfig = createRoom('create+invite', otherAttributes)
         return setRoom(roomConfig)
       }
-      socket.emit('invite', { room, invitingId: user.id })
+      const invitation = createInvitation({ room, socket, name, user })
+      socket.emit('invite', invitation)
     }
   }
 

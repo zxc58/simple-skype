@@ -1,14 +1,18 @@
 import React, { useContext } from 'react'
 import { Button, Modal } from 'react-bootstrap'
 import { StatusContext } from '../routes/Main'
+import { invitationToRoom } from '../global/helpers'
 import '../css/invitation.css'
 //
 function Invitation (props) {
   const { invitation, setInvitation } = props
-  const { inviterName, room } = invitation
+  const { inviterName } = invitation
   const { setRoom } = useContext(StatusContext)
   const eventHandler = {
     accept: () => {
+      console.log('accept')
+      const room = invitationToRoom(invitation)
+      console.log(room)
       setRoom(room)
     },
     reject: () => setInvitation(null)

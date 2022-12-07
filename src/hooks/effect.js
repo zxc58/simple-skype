@@ -1,29 +1,35 @@
 import { useEffect } from 'react'
-import { disableRemoteVideo, initPc, socket, onHide, onDisplay, onInvite, enableMyVideo, createSignal, onToggleBusy } from '../global/instance'
-
+import {
+  disableLocalVideo, disableRemoteVideo, initPc, socket, onHide,
+  onDisplay, onInvite, enableMyVideo, createSignal, onToggleBusy
+} from '../global/instance'
+import { createInvitation } from '../global/helpers'
 export const modalSideEffect = (setInvitation) => useEffect(() => {
   onInvite({ setInvitation })
 }, [])
 
-export const roomSideEffect = ({ room, invitation }) => useEffect(() => {
+export const roomSideEffect = ({ room, invitation, setRoom, setInvitation }) => useEffect(() => {
   if (room) {
-    const { createRoomCallback } = room;
-    (async () => {
-      await enableMyVideo()
-      socket.emit('joinRoom', room, invitation
-        ? async () => await createSignal('Offer')
-        : (room) => { if (createRoomCallback) { createRoomCallback(room) } }
-      )
-    })()
-  } else {
-    initPc()
-    disableRemoteVideo()
-    const localVideo = document.getElementById('local-video')
-    if (localVideo.srcObject) {
-      socket.emit('leaveRoom')
-      localVideo.srcObject.getTracks().forEach(track => track.stop())
-      localVideo.srcObject = null
+    const { action } = room
+    switch (action) {
+      case 'create':
+        socket.emit('joinRoom', room, async (room) => { await enableMyVideo() })
+        break
+      case 'create+invite':
+        socket.emit('joinRoom', room, async (room) => {
+          await enableMyVideo()
+          const invitation = createInvitation({ room })
+          socket.emit('invite', invitation)
+        })
+        break
+      case 'accept invite':
+        socket.emit('joinRoom', room, async (result) => {
+          if (!result) { setRoom(false); setInvitation(null) } else { await enableMyVideo(); await createSignal('Offer') }
+        })
+        break
     }
+  } else {
+    if (room === false) { window.alert('Room is fullyBooked') } else { initPc(); disableRemoteVideo(); disableLocalVideo() }
   }
 }, [room])
 

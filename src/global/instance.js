@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { createLocalStream } from './helpers'
 import { io } from 'socket.io-client'
 //
@@ -6,7 +5,10 @@ let pc
 export const socket = io(process.env.REACT_APP_BACKEND)
 //
 export function initPc () {
-  if (pc) { pc.close() }
+  if (pc) {
+    if (!pc.currentRemoteDescription) { return }
+    pc.close()
+  }
   const configuration = {
     iceServers: [{
       urls: 'stun:stun.l.google.com:19302' // Google's public STUN server
@@ -62,8 +64,8 @@ export const enableMyVideo = async () => {
   }
 }
 
-export const onInvite = ({ setInvitation }) => socket.on('invite', ({ inviterName, room }) => {
-  setInvitation({ inviterName, room })
+export const onInvite = ({ setInvitation }) => socket.on('invite', (invitation) => {
+  setInvitation(invitation)
 })
 
 export const onDisplay = ({ setUsers }) => socket.on('display', (user) => {
@@ -105,4 +107,11 @@ export function disableRemoteVideo () {
   if (!remoteVideo.srcObject) { return }
   remoteVideo.srcObject.getTracks().forEach(track => track.stop())
   remoteVideo.srcObject = null
+}
+export function disableLocalVideo () {
+  const localVideo = document.getElementById('local-video')
+  if (!localVideo.srcObject) { return }
+  socket.emit('leaveRoom')
+  localVideo.srcObject.getTracks().forEach(track => track.stop())
+  localVideo.srcObject = null
 }

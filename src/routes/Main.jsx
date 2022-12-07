@@ -1,6 +1,4 @@
-/* eslint-disable no-unused-vars */
 import React, { useState } from 'react'
-import { v4 as uuidv4 } from 'uuid'
 import { createRoom } from '../global/helpers'
 import List from '../components/List'
 import Invitation from '../components/Invitation'
@@ -9,9 +7,10 @@ import '../css/main.css'
 import { roomSideEffect, modalSideEffect } from '../hooks/effect'
 export const StatusContext = React.createContext()
 export default function Main (props) {
+  const { name } = props
   const [room, setRoom] = useState(null)
   const [invitation, setInvitation] = useState(null)
-  roomSideEffect({ room, invitation })
+  roomSideEffect({ room, setRoom, invitation, setInvitation })
   modalSideEffect(setInvitation)
   const eventHandler = {
     start: () => setRoom(createRoom()),
@@ -22,7 +21,7 @@ export default function Main (props) {
   }
 
   return (
-    <StatusContext.Provider value={{ room, setRoom, start: eventHandler.start }}>
+    <StatusContext.Provider value={{ name, room, setRoom, start: eventHandler.start }}>
       <Container>
         <Row>
           <Col sm={5} className='bg-black video-col d-flex align-items-center border-end border-white'>
