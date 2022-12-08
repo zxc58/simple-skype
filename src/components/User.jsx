@@ -1,4 +1,4 @@
-import { createRoom, createInvitation } from '../global/helpers'
+import { createRoom, createInvitation, fullBookedBadge } from '../global/helpers'
 import { StatusContext } from '../routes/Main'
 import React, { useContext } from 'react'
 import { socket } from '../global/instance'
@@ -8,8 +8,11 @@ export default function User (props) {
   const { user } = props
   const { name, room, setRoom } = useContext(StatusContext)
   const eventHandler = {
-    invite: () => {
-      if (document.getElementById('remote-video').srcObject) { return }
+    invite: (e) => {
+      if (document.getElementById('remote-video').srcObject) {
+        fullBookedBadge(e)
+        return
+      }
       if (!room) { // create room and invite
         const otherAttributes = { invitingId: user.id, invitingName: user.name, inviterName: name, inviterId: socket.id }
         const roomConfig = createRoom('create+invite', otherAttributes)

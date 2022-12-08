@@ -25,3 +25,19 @@ export const invitationToRoom = (invitation) => ({
   action: 'accept invite',
   size: roomSize
 })
+export const fullBookedBadge = (clickEvent) => {
+  const { clientX, clientY } = clickEvent
+  const badge = document.getElementById('badge-warn')
+  badge.classList.remove('d-none')
+  badge.style.left = `${clientX}px`
+  badge.style.top = `${clientY}px`
+  badge.style.opacity = 1
+  const time = setInterval(() => {
+    console.log(badge.style.opacity)
+    if (badge.style.opacity <= 0.1) {
+      badge.style.opacity = 1; badge.classList.add('d-none'); clearInterval(time)
+    } else {
+      badge.style.opacity -= 1.000005 - (badge.style.opacity)
+    }
+  }, 100)
+}
