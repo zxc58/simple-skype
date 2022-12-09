@@ -1,20 +1,27 @@
+/* eslint-disable no-unused-vars */
 import React, { useState } from 'react'
 import { createRoom } from '../global/helpers'
 import List from '../components/List'
 import Invitation from '../components/Invitation'
+import Video from '../components/Video'
 import { Button, Container, Row, Col } from 'react-bootstrap'
 import '../css/main.css'
 import { roomSideEffect, modalSideEffect } from '../hooks/effect'
 export const StatusContext = React.createContext()
+const maxCol = 2
 export default function Main (props) {
   const { name } = props
+  const [videos, setVideos] = useState([])
   const [room, setRoom] = useState(null)
   const [invitation, setInvitation] = useState(null)
-  roomSideEffect({ room, setRoom, invitation, setInvitation })
+  roomSideEffect({ room, setRoom, invitation, setInvitation, videos, setVideos })
   modalSideEffect(setInvitation)
   const eventHandler = {
-    start: () => setRoom(createRoom()),
+    start: () => {
+      setRoom(createRoom()) // require back end create a room
+    },
     leave: () => {
+      setVideos([])
       setRoom(null)
       setInvitation(null)
     }
@@ -24,21 +31,19 @@ export default function Main (props) {
     <StatusContext.Provider value={{ name, room, setRoom, start: eventHandler.start }}>
       <Container>
         <Row>
-          <Col sm={2} className='px-0 bg-light video-col border-end'>
+          <Col lg={2} className='px-0 bg-light video-col border-end'>
             <List/>
-          </Col>
-          <Col sm={5} className='bg-black video-col d-flex align-items-center border-end border-white'>
-            <div className='w-100 text-center'>
+            <footer>
               <Button size='lg' className={!room ? 'rounded-pill' : 'd-none'} onClick={eventHandler.start}>Start</Button>
-              <video className={room ? 'videos' : 'd-none'} id='local-video' autoPlay ></video>
-              <Button size='lg' variant='danger' className={room ? 'rounded-circle' : 'd-none'} onClick={eventHandler.leave}>Leave</Button>
-            </div>
+              <Button size='lg' variant='danger' className={room ? 'rounded-pill' : 'd-none'} onClick={eventHandler.leave}>Leave</Button>
+            </footer>
           </Col>
-          <Col sm={5} className='bg-black video-col d-flex align-items-center  '>
-            <div className='w-100 text-center'>
-              <p className={!room ? 'text-white fs-1' : 'd-none'}>Click user to invite.</p>
-              <video className='videos' id='remote-video' autoPlay ></video>
-            </div>
+          <Col lg={10} className={videos.length > maxCol ? `row bg-black row-cols-${maxCol}` : 'row bg-black'}>
+            {/* <Row className=' row-cols-3'> */}
+            {/* <Col className='bg-white'>qwe</Col><Col className='bg-light'>asd</Col><Col className='bg-white'>zxc</Col>
+            <Col className='bg-white'>123</Col> */}
+              {videos.length > 0 ? videos.map(e => <Video key={e.id} config={e} count={videos.length}/>) : null}
+            {/* </Row> */}
           </Col>
         </Row>
       </Container>

@@ -1,0 +1,8 @@
+# React states 
+    name : name
+    videos : 
+    room :  { id, type, action, size, other }
+    invitation : { type, roomId, inviterId, invitingId, inviterName, invitingName }
+    users :
+# 從 '一對一視訊' 到 '多人視訊':
+    

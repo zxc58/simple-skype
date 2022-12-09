@@ -24,7 +24,7 @@ export default function User (props) {
   }
 
   return (
-    <Button className='my-1'
+    <Button className='my-1 rounded-pill'
       variant={!user.isBusy ? 'success' : 'danger'}
       disabled={user.isBusy}
       onClick={!user.isBusy ? eventHandler.invite : null}

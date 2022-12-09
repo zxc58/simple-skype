@@ -1,56 +1,49 @@
 import { createLocalStream } from './helpers'
 import { io } from 'socket.io-client'
 //
-let pc
 export const socket = io(process.env.REACT_APP_BACKEND)
-//
-export function initPc () {
-  if (pc) {
-    if (!pc.currentRemoteDescription) { return }
-    pc.close()
-  }
+function createPc (localStream = null) {
   const configuration = {
     iceServers: [{
       urls: 'stun:stun.l.google.com:19302' // Google's public STUN server
     }]
   }
   // eslint-disable-next-line no-undef
-  pc = new RTCPeerConnection(configuration)
+  const pc = new RTCPeerConnection(configuration)
   pc.onicecandidate = ({ candidate }) => { // 當通過 RTCPeerConnection.setLocalDescription()方法更改本地描述之後icecandidate 事件
     if (!candidate) { return }
     socket.emit('peerconnectSignaling', { candidate })
   }
   pc.ontrack = ({ track }) => {
-    if (!track) { return }
-    const remoteVideo = document.getElementById('remote-video')
-    if (!remoteVideo.srcObject) {
-      // eslint-disable-next-line no-undef
-      remoteVideo.srcObject = new MediaStream()
-    }
-    remoteVideo.srcObject.addTrack(track)
+
   }
+  const localVideoStream = document.getElementById('local-video').srcObject
+  localVideoStream.getTracks().forEach(track => {
+    pc.addTrack(track)
+  })
+  return pc
 }
 //
-socket.on('peerconnectSignaling', async ({ desc, candidate }) => {
-  if (desc && !pc.currentRemoteDescription) {
+export const socketOn = {}
+export const onSignal = ({ videos, setVideos }) => socket.on('peerconnectSignaling', async ({ socketId, desc, candidate }) => {
+  const video = videos.find(e => e.id === socketId)
+  const pc = video?.pc ?? createPc()
+  if (desc) {
     // eslint-disable-next-line no-undef
     await pc.setRemoteDescription(new RTCSessionDescription(desc))
+
     if (!(desc.type === 'answer')) { await createSignal('Answer') }
   } else if (candidate) {
     // eslint-disable-next-line no-undef
     await pc.addIceCandidate(new RTCIceCandidate(candidate))
   }
+  if (!video) { setVideos(prev => { return [...prev, { id: socketId, type: 'remote video', pc }] }) }
 })
-socket.on('leaveRoom', (leaverId) => {
-  disableRemoteVideo()
-  initPc()
-  const localVideo = document.getElementById('local-video')
-  localVideo.srcObject.getTracks().forEach(track => {
-    pc.addTrack(track)
-  })
+export const onLeaveRoom = ({ videos, setVideos }) => socket.on('leaveRoom', (leaverId) => {
+
 })
 //
-export const enableMyVideo = async () => {
+export const enableMyVideo = async (pc) => {
   try {
     const localVideo = document.getElementById('local-video')
     if (localVideo.srcObject) { throw new Error('Local video exsit') }
@@ -87,7 +80,7 @@ export const onToggleBusy = ({ setUsers }) => socket.on('toggleBusy', (userId) =
   })
 })
 //
-export async function createSignal (type) {
+export async function createSignal (pc, type) {
   try {
     if (!pc || !(type === 'Answer' || type === 'Offer')) { return }
     // 呼叫 peerConnect 內的 createOffer / createAnswer
@@ -104,13 +97,13 @@ export async function createSignal (type) {
 
 export function disableRemoteVideo () {
   const remoteVideo = document.getElementById('remote-video')
-  if (!remoteVideo.srcObject) { return }
+  if (!remoteVideo?.srcObject) { return }
   remoteVideo.srcObject.getTracks().forEach(track => track.stop())
   remoteVideo.srcObject = null
 }
 export function disableLocalVideo () {
   const localVideo = document.getElementById('local-video')
-  if (!localVideo.srcObject) { return }
+  if (!localVideo?.srcObject) { return }
   socket.emit('leaveRoom')
   localVideo.srcObject.getTracks().forEach(track => track.stop())
   localVideo.srcObject = null

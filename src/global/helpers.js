@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
-const roomSize = process.env.REACT_APP_ROOM_SIZE ?? 2
+const roomSize = process.env.REACT_APP_ROOM_SIZE ?? 4
 export const createLocalStream = async () => {
   const constraints = { audio: true, video: true }
   return navigator.mediaDevices.getUserMedia(constraints)
@@ -33,7 +33,6 @@ export const fullBookedBadge = (clickEvent) => {
   badge.style.top = `${clientY}px`
   badge.style.opacity = 1
   const time = setInterval(() => {
-    console.log(badge.style.opacity)
     if (badge.style.opacity <= 0.1) {
       badge.style.opacity = 1; badge.classList.add('d-none'); clearInterval(time)
     } else {
@@ -41,3 +40,4 @@ export const fullBookedBadge = (clickEvent) => {
     }
   }, 100)
 }
+export const createVideo = () => ({})

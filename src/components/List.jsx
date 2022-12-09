@@ -12,7 +12,7 @@ export default function List (props) {
     <>
       <h4 className='my-0 mx-0 position-fixed d-none' id='badge-warn'><Badge bg="danger" >聊天室已滿</Badge></h4>
       <h5 className='text-center text-white bg-primary py-1'>{name}</h5>
-      <ListGroup className='overflow-auto'>
+      <ListGroup className='overflow-auto h-75'>
         {usersComponents}
       </ListGroup>
     </>

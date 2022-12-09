@@ -1,23 +1,28 @@
+/* eslint-disable no-unused-vars */
 import { useEffect } from 'react'
 import {
   disableLocalVideo, disableRemoteVideo, initPc, socket, onHide,
   onDisplay, onInvite, enableMyVideo, createSignal, onToggleBusy
 } from '../global/instance'
-import { createInvitation } from '../global/helpers'
+import { createInvitation, createLocalStream } from '../global/helpers'
 export const modalSideEffect = (setInvitation) => useEffect(() => {
   onInvite({ setInvitation })
 }, [])
 
-export const roomSideEffect = ({ room, invitation, setRoom, setInvitation }) => useEffect(() => {
+export const roomSideEffect = ({ room, invitation, videos, setRoom, setInvitation, setVideos }) => useEffect(() => {
   if (room) {
     const { action } = room
     switch (action) {
       case 'create':
-        socket.emit('joinRoom', room, async (room) => { await enableMyVideo() })
+        socket.emit('joinRoom', room, async (room) => {
+          const localStream = await createLocalStream()
+          setVideos([{ id: socket.id, type: 'local-video', stream: localStream }])
+        })
         break
       case 'create+invite':
         socket.emit('joinRoom', room, async (room) => {
-          await enableMyVideo()
+          const localStream = await createLocalStream()
+          setVideos([{ id: socket.id, type: 'local video', stream: localStream }])
           const invitation = createInvitation({ room })
           socket.emit('invite', invitation)
         })
