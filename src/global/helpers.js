@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
-const roomSize = process.env.REACT_APP_ROOM_SIZE ?? 4
+export const roomSize = process.env.REACT_APP_ROOM_SIZE ?? 4
 export const createLocalStream = async () => {
   const constraints = { audio: true, video: true }
   return navigator.mediaDevices.getUserMedia(constraints)
@@ -40,4 +40,6 @@ export const fullBookedBadge = (clickEvent) => {
     }
   }, 100)
 }
-export const createVideo = () => ({})
+export const createVideo = ({ id, type, pc, stream }) => ({
+  id, type, pc, stream
+})

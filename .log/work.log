@@ -1,0 +1,5 @@
+# 從 '一對一視訊' 到 '多人視訊':
+    難處 :
+    setState是非同步的,又有多個event同時執行以下code
+        if ( state.includes(c) ) { /*A*/ } else{ setState( prev => [...prev,c] ) ; /*B*/ }
+    導致可能因為時間差有判斷式錯誤的情形,要嚴格控制event流程  

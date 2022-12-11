@@ -1,12 +1,12 @@
-/* eslint-disable no-unused-vars */
 import React, { useState } from 'react'
+import { Button, Container, Row, Col } from 'react-bootstrap'
 import { createRoom } from '../global/helpers'
 import List from '../components/List'
 import Invitation from '../components/Invitation'
 import Video from '../components/Video'
-import { Button, Container, Row, Col } from 'react-bootstrap'
+import effectHook from '../hooks/effect'
 import '../css/main.css'
-import { roomSideEffect, modalSideEffect } from '../hooks/effect'
+//
 export const StatusContext = React.createContext()
 const maxCol = 2
 export default function Main (props) {
@@ -14,8 +14,8 @@ export default function Main (props) {
   const [videos, setVideos] = useState([])
   const [room, setRoom] = useState(null)
   const [invitation, setInvitation] = useState(null)
-  roomSideEffect({ room, setRoom, invitation, setInvitation, videos, setVideos })
-  modalSideEffect(setInvitation)
+  effectHook.room({ room, setRoom, invitation, setInvitation, videos, setVideos })
+  effectHook.invitation({ setInvitation, videos, setVideos })
   const eventHandler = {
     start: () => {
       setRoom(createRoom()) // require back end create a room

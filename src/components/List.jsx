@@ -1,12 +1,13 @@
-import { StatusContext } from '../routes/Main'
 import React, { useState, useContext } from 'react'
-import User from './User'
 import { ListGroup, Badge } from 'react-bootstrap'
-import { usersSideEffect } from '../hooks/effect'
+import { StatusContext } from '../routes/Main'
+import User from './User'
+import effectHook from '../hooks/effect'
+//
 export default function List (props) {
   const [users, setUsers] = useState([])
   const { name } = useContext(StatusContext)
-  usersSideEffect(setUsers)
+  effectHook.users(setUsers)
   const usersComponents = users.map(e => <User key={e.id} user={e}/>)
   return (
     <>

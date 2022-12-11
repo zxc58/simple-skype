@@ -10,9 +10,7 @@ function Invitation (props) {
   const { setRoom } = useContext(StatusContext)
   const eventHandler = {
     accept: () => {
-      console.log('accept')
       const room = invitationToRoom(invitation)
-      console.log(room)
       setRoom(room)
     },
     reject: () => setInvitation(null)

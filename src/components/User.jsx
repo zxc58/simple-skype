@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { createRoom, createInvitation, fullBookedBadge } from '../global/helpers'
 import { StatusContext } from '../routes/Main'
 import React, { useContext } from 'react'
@@ -9,10 +10,10 @@ export default function User (props) {
   const { name, room, setRoom } = useContext(StatusContext)
   const eventHandler = {
     invite: (e) => {
-      if (document.getElementById('remote-video').srcObject) {
-        fullBookedBadge(e)
-        return
-      }
+      // if (document.getElementById('remote-video').srcObject) {
+      //   fullBookedBadge(e)
+      //   return
+      // }
       if (!room) { // create room and invite
         const otherAttributes = { invitingId: user.id, invitingName: user.name, inviterName: name, inviterId: socket.id }
         const roomConfig = createRoom('create+invite', otherAttributes)

@@ -1,8 +1,6 @@
 # React states 
     name : name
-    videos : 
+    videos : array of {id, pc ,stream,type,sendOffer}
     room :  { id, type, action, size, other }
     invitation : { type, roomId, inviterId, invitingId, inviterName, invitingName }
     users :
-# 從 '一對一視訊' 到 '多人視訊':
-    
