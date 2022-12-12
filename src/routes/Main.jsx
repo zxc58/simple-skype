@@ -6,10 +6,13 @@ import { socket, videoControl, pcControl } from '../global/instance'
 import List from '../components/List'
 import Invitation from '../components/Invitation'
 import Video from '../components/Video'
-import '../css/main.css'
+// ENV variable
+const { maxCol, roomSize, height } = {
+  maxCol: process.env.REACT_APP_MAX_COL ?? 2,
+  roomSize: process.env.REACT_APP_ROOM_SIZE ?? 4,
+  height: process.env.REACT_APP_HEIGHT ?? '600px'
+}
 //
-const maxCol = 2
-const roomSize = process.env.REACT_APP_ROOM_SIZE ?? 4
 export const StatusContext = React.createContext()
 export default function Main (props) {
   const { name } = props
@@ -21,8 +24,7 @@ export default function Main (props) {
     socket.on('invite', (invitation) => { setInvitation(invitation) })
 
     socket.on('peerconnectSignaling', async ({ recipientId, senderId, desc, candidate }) => {
-      const pc = pcControl.adapter.get(senderId)
-      console.log(pc);
+      const pc = pcControl.adapter.get(senderId);
       ([recipientId, senderId] = [senderId, recipientId])
       if (desc) {
         await pc.setRemoteDescription(new RTCSessionDescription(desc))
@@ -38,7 +40,7 @@ export default function Main (props) {
       const stream = new MediaStream()
       const pc = pcControl.createPc(socketId, stream)
       pcControl.adapter.set(socketId, pc)
-      const newVideo = { id: socketId, type: 'remote video', pc, stream }
+      const newVideo = { id: socketId, type: 'remote-video', pc, stream }
       setVideos(prev => [...prev, newVideo])
     })
   }, [])
@@ -70,7 +72,7 @@ export default function Main (props) {
             const b = socketIdArray.map(id => {
               const stream = new MediaStream()
               const pc = pcControl.createPc(id, stream)
-              return { id, pc, stream, type: 'remote video', sendOffer: true }
+              return { id, pc, stream, type: 'remote-video', sendOffer: true }
             })
             b.unshift({ id: socket.id, type: 'local-video', stream: videoControl.getLocalVideoStream() })
             setTimeout(() =>
@@ -82,7 +84,7 @@ export default function Main (props) {
       if (room === false) { window.alert('Room is fullyBooked') }
     }
   }, [room])
-  //
+  // Event handler
   const clickEventHandler = {
     start: () => {
       setRoom(createRoom()) // require back end create a room
@@ -93,24 +95,24 @@ export default function Main (props) {
       setInvitation(null)
     }
   }
-
+  // Dynamic style
+  const colStyle = { height }
+  //
   return (
     <StatusContext.Provider value={{ name, room, setRoom, start: clickEventHandler.start }}>
       <Container>
         <Row>
-          <Col lg={2} className='px-0 bg-light video-col border-end'>
+          <Col lg={2} className='px-0 bg-light border-end' style={colStyle}>
             <List/>
             <footer>
               <Button size='lg' className={!room ? 'rounded-pill' : 'd-none'} onClick={clickEventHandler.start}>Start</Button>
               <Button size='lg' variant='danger' className={room ? 'rounded-pill' : 'd-none'} onClick={clickEventHandler.leave}>Leave</Button>
             </footer>
           </Col>
-          <Col lg={10} className={videos.length > maxCol ? `row bg-black row-cols-${maxCol}` : 'row bg-black'}>
-            {/* <Row className=' row-cols-3'> */}
-            {/* <Col className='bg-white'>qwe</Col><Col className='bg-light'>asd</Col><Col className='bg-white'>zxc</Col>
-            <Col className='bg-white'>123</Col> */}
-              {videos.length > 0 ? videos.map(e => <Video key={e.id} config={e} count={videos.length}/>) : null}
-            {/* </Row> */}
+          <Col lg={10} className={'video-col bg-dark'} style={colStyle}>
+            <Row className={videos.length > maxCol ? `row-cols-${maxCol}` : ''}>
+              {videos.length > 0 ? videos.map(e => <Video key={e.id} config={e} videoCount={videos.length}/>) : null}
+            </Row>
           </Col>
         </Row>
       </Container>

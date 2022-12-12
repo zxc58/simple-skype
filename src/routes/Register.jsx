@@ -2,7 +2,6 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Form, Button, Container } from 'react-bootstrap'
 import { socket } from '../global/instance'
-import '../css/register.css'
 export default function Register (props) {
   const { setName } = props
   const navigate = useNavigate()

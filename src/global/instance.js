@@ -67,7 +67,7 @@ export const socketOn = {
   newOneJoin: ({ getVideos, setVideos }) => socket.on('newOneJoin', async (socketId) => {
     if (getVideos().length > roomSize) { return }
     const [pc, stream] = [pcControl.createPc(), new MediaStream()]
-    const newVideo = { id: socketId, type: 'remote video', pc, stream }
+    const newVideo = { id: socketId, type: 'remote-video', pc, stream }
     setVideos(prev => [...prev, newVideo])
     // await createSignal({ pc, type: 'Offer', recipientId: socketId, senderId: socketId })
   })

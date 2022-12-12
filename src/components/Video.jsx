@@ -1,9 +1,8 @@
 import React, { useEffect } from 'react'
 import { Col } from 'react-bootstrap'
 import { socket, pcControl } from '../global/instance'
-import '../css/video.css'
 export default function Video (props) {
-  const { config } = props
+  const { config, videoCount } = props
   const { id, stream, type, pc, sendOffer } = config
 
   useEffect(() => {
@@ -19,10 +18,16 @@ export default function Video (props) {
       }
     }
   }, [])
-
+  const danamicStyle = {
+    borderStyle: 'solid',
+    borderWidth: '2px',
+    borderColor: type === 'local-video' ? 'blue' : '',
+    height: videoCount > 2 ? '300px' : '600px',
+    maxWidth: '100%'
+  }
   return (
     <Col className='text-center'>
-      <video className={type} id={id} autoPlay></video>
+      <video style={danamicStyle} id={id} autoPlay></video>
     </Col>
   )
 }
