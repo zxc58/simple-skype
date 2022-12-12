@@ -1,5 +1,8 @@
 # 從 '一對一視訊' 到 '多人視訊':
     難處 :
-    setState是非同步的,又有多個event同時執行以下code
+    setState是非同步的,又有多個event同時執行以下code 不能 '及時'控制想要的pc數量
         if ( state.includes(c) ) { /*A*/ } else{ setState( prev => [...prev,c] ) ; /*B*/ }
     導致可能因為時間差有判斷式錯誤的情形,要嚴格控制event流程  
+'#done' 把useEffect移到正確位置
+# 箭頭函式當中的 this 綁定的是是定義時的物件，而不是使用時的物件
+# 建立一個 Map(named adapter) key:socketId value:RTCPeerConnection

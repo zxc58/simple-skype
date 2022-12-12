@@ -1,14 +1,17 @@
 /* eslint-disable no-unused-vars */
 import { createRoom, createInvitation, fullBookedBadge } from '../global/helpers'
 import { StatusContext } from '../routes/Main'
-import React, { useContext } from 'react'
+import React, { useEffect, useContext } from 'react'
 import { socket } from '../global/instance'
 import { Button } from 'react-bootstrap'
 
 export default function User (props) {
   const { user } = props
   const { name, room, setRoom } = useContext(StatusContext)
-  const eventHandler = {
+  // useEffect
+
+  // EventHandler
+  const clickEventHandler = {
     invite: (e) => {
       // if (document.getElementById('remote-video').srcObject) {
       //   fullBookedBadge(e)
@@ -28,7 +31,7 @@ export default function User (props) {
     <Button className='my-1 rounded-pill'
       variant={!user.isBusy ? 'success' : 'danger'}
       disabled={user.isBusy}
-      onClick={!user.isBusy ? eventHandler.invite : null}
+      onClick={!user.isBusy ? clickEventHandler.invite : null}
     >
       {user.name}
     </Button>

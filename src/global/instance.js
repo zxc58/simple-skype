@@ -29,18 +29,18 @@ export const videoControl = {
 // socket
 export const socket = io(process.env.REACT_APP_BACKEND)
 export const socketOn = {
-  signal: ({ videos, setVideos }) => socket.on('peerconnectSignaling', async ({ socketId, desc, candidate }) => {
-    const video = videos.find(e => e.id === socketId)
-    const pc = video?.pc ?? createPc()
+  signal: ({ getVideos, setVideos }) => socket.on('peerconnectSignaling', async ({ recipientId, senderId, desc, candidate }) => {
+    const video = getVideos().find(e => e.id === senderId)
+    if (!video) { console.log('no pc'); return socket.emit('return', 'peerconnectSignaling', { recipientId, senderId, desc, candidate }) };
+    ([recipientId, senderId] = [senderId, recipientId])
+    const pc = video.pc
     if (desc) {
-      // eslint-disable-next-line no-undef
       await pc.setRemoteDescription(new RTCSessionDescription(desc))
-      if (!(desc.type === 'answer')) { await createSignal('Answer') }
+      if (!(desc.type === 'answer')) { await pc.pcControl.createSignal({ pc, type: 'Answer', senderId, recipientId }) }
     } else if (candidate) {
       // eslint-disable-next-line no-undef
       await pc.addIceCandidate(new RTCIceCandidate(candidate))
     }
-    if (!video) { setVideos(prev => { return [...prev, { id: socketId, type: 'remote video', pc }] }) }
   }),
   toggleBusy: ({ setUsers }) => socket.on('toggleBusy', (userId) => {
     setUsers(prevUsers => {
@@ -64,46 +64,82 @@ export const socketOn = {
   leaveRoom: ({ videos, setVideos }) => socket.on('leaveRoom', (leaverId) => {
 
   }),
-  newOneJoin: ({ videos, setVideos }) => socket.on('newOneJoin', async (socketId) => {
-    if (videos.length > roomSize) { return }
-    const [pc, stream] = [createPc(), new MediaStream()]
+  newOneJoin: ({ getVideos, setVideos }) => socket.on('newOneJoin', async (socketId) => {
+    if (getVideos().length > roomSize) { return }
+    const [pc, stream] = [pcControl.createPc(), new MediaStream()]
     const newVideo = { id: socketId, type: 'remote video', pc, stream }
     setVideos(prev => [...prev, newVideo])
     // await createSignal({ pc, type: 'Offer', recipientId: socketId, senderId: socketId })
   })
 }
 // pc
-export function createPc (id) {
-  const configuration = {
-    iceServers: [{
-      urls: 'stun:stun.l.google.com:19302' // Google's public STUN server
-    }]
-  }
-  const pc = new RTCPeerConnection(configuration)
-
-  pc.ontrack = ({ track }) => {
-    const a = document.getElementById(id)
-    if (track && a.srcObject) { a.srcObject.addTrack(track) }
-  }
-  videoControl.getLocalVideoStream().getTracks().forEach(track => {
-    pc.addTrack(track)
-  })
-  return pc
-}
-
-export async function createSignal ({ pc, type, recipientId, senderId }) {
-  try {
-    if (!pc || !(type === 'Answer' || type === 'Offer')) { return }
-    pc.onicecandidate = ({ candidate }) => { // 當通過 RTCPeerConnection.setLocalDescription()方法更改本地描述之後icecandidate 事件
-      if (!(candidate && pc.localDescription)) { return }
-      socket.emit('peerconnectSignaling', { candidate, recipientId, senderId })
+export const pcControl = {
+  adapter: new Map(),
+  createPc: function (id) {
+    const configuration = {
+      iceServers: [{
+        urls: 'stun:stun.l.google.com:19302' // Google's public STUN server
+      }]
     }
-    const signalOption = { offerToReceiveAudio: 1, offerToReceiveVideo: 1 }
-    const offer = await pc[`create${type}`](signalOption)// 呼叫 peerConnect 內的 createOffer / createAnswer
-    socket.emit('peerconnectSignaling', { offer, recipientId, senderId }, async () => {
-      await pc.setLocalDescription(offer)// 設定本地流配置
+    const pc = new RTCPeerConnection(configuration)
+    this.adapter.set(id, pc)
+    pc.ontrack = ({ track }) => {
+      const a = document.getElementById(id)
+      if (track && a.srcObject) { a.srcObject.addTrack(track) }
+    }
+    videoControl.getLocalVideoStream().getTracks().forEach(track => {
+      pc.addTrack(track)
     })
-  } catch (err) {
-    console.log(err)
+    return pc
+  },
+  createSignal: async ({ pc, type, recipientId, senderId }) => {
+    try {
+      if (!pc || !(type === 'Answer' || type === 'Offer')) { return }
+      pc.onicecandidate = ({ candidate }) => { // 當通過 RTCPeerConnection.setLocalDescription()方法更改本地描述之後icecandidate 事件
+        if (!(candidate && pc.localDescription)) { return }
+        socket.emit('peerconnectSignaling', { candidate, recipientId, senderId })
+      }
+      const signalOption = { offerToReceiveAudio: 1, offerToReceiveVideo: 1 }
+      const offer = await pc[`create${type}`](signalOption)// 呼叫 peerConnect 內的 createOffer / createAnswer
+      socket.emit('peerconnectSignaling', { desc: offer, recipientId, senderId }, async () => {
+        await pc.setLocalDescription(offer)// 設定本地流配置
+      })
+    } catch (err) {
+      console.log(err)
+    }
   }
 }
+// export function createPc (id) {
+//   const configuration = {
+//     iceServers: [{
+//       urls: 'stun:stun.l.google.com:19302' // Google's public STUN server
+//     }]
+//   }
+//   const pc = new RTCPeerConnection(configuration)
+
+//   pc.ontrack = ({ track }) => {
+//     const a = document.getElementById(id)
+//     if (track && a.srcObject) { a.srcObject.addTrack(track) }
+//   }
+//   videoControl.getLocalVideoStream().getTracks().forEach(track => {
+//     pc.addTrack(track)
+//   })
+//   return pc
+// }
+
+// export async function createSignal ({ pc, type, recipientId, senderId }) {
+//   try {
+//     if (!pc || !(type === 'Answer' || type === 'Offer')) { return }
+//     pc.onicecandidate = ({ candidate }) => { // 當通過 RTCPeerConnection.setLocalDescription()方法更改本地描述之後icecandidate 事件
+//       if (!(candidate && pc.localDescription)) { return }
+//       socket.emit('peerconnectSignaling', { candidate, recipientId, senderId })
+//     }
+//     const signalOption = { offerToReceiveAudio: 1, offerToReceiveVideo: 1 }
+//     const offer = await pc[`create${type}`](signalOption)// 呼叫 peerConnect 內的 createOffer / createAnswer
+//     socket.emit('peerconnectSignaling', { desc: offer, recipientId, senderId }, async () => {
+//       await pc.setLocalDescription(offer)// 設定本地流配置
+//     })
+//   } catch (err) {
+//     console.log(err)
+//   }
+// }
