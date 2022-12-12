@@ -1,0 +1,7 @@
+# 這篇記錄此project中的難題與解法，以及學習新技術和複和複習舊技能
+    
+    箭頭函式當中的 this 綁定的是是定義時的物件，而不是使用時的物件
+    
+    從 '一對一視訊' 到 '多人視訊':
+        setState是非同步的，更新不即時(我要創造新的peerConnect)，想要用state做事會要注意(或許可用useEffect，這次不行)
+        解法: 建立一個 Map(named adapter) key:socketId value:RTCPeerConnection 即可

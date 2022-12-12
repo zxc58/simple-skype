@@ -1,6 +1,8 @@
-# React states 
-    name : name
-    videos : array of {id, pc ,stream,type,sendOffer}
-    room :  { id, type, action, size, other }
-    invitation : { type, roomId, inviterId, invitingId, inviterName, invitingName }
-    users :
+# 這篇記錄此專案中的規格
+    React states 
+        name : name
+        videos : array of {id, pc ,stream,type,sendOffer}
+        room :  { id, type, action, size, other }
+        invitation : { type, roomId, inviterId, invitingId, inviterName, invitingName }
+        users :
+    inviting send peerConnect Offer

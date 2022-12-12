@@ -1,5 +1,0 @@
-按下accept後 雙方都沒出現對方影像  ，  原因應該在socket on peerconnectSignal(both side),
-*收件人 寄件人填好 並依據他們找到對應pc
-/////
-收到offer 時 pc?
-
