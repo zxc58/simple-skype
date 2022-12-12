@@ -23,10 +23,7 @@ export default function Main (props) {
     socket.on('peerconnectSignaling', async ({ recipientId, senderId, desc, candidate }) => {
       const pc = pcControl.adapter.get(senderId)
       console.log(pc);
-      // const video = videos.find(e => e.id === senderId);
-      // if (!video) { console.log('no pc'); return socket.emit('return', 'peerconnectSignaling', { recipientId, senderId, desc, candidate }) };
       ([recipientId, senderId] = [senderId, recipientId])
-      // const pc = video.pc
       if (desc) {
         await pc.setRemoteDescription(new RTCSessionDescription(desc))
         if (!(desc.type === 'answer')) { await pcControl.createSignal({ pc, type: 'Answer', senderId, recipientId }) }
@@ -38,7 +35,8 @@ export default function Main (props) {
 
     socket.on('newOneJoin', async (socketId) => {
       if (videos.length > roomSize) { return }
-      const [pc, stream] = [pcControl.createPc(), new MediaStream()]
+      const stream = new MediaStream()
+      const pc = pcControl.createPc(socketId, stream)
       pcControl.adapter.set(socketId, pc)
       const newVideo = { id: socketId, type: 'remote video', pc, stream }
       setVideos(prev => [...prev, newVideo])
@@ -69,7 +67,11 @@ export default function Main (props) {
             if (!result) { setRoom(false); setInvitation(null); return }
             const socketIdArray = result.filter(e => e !== socket.id)
             if (!videoControl.getLocalVideoStream()) { await videoControl.enableLocalVideo() }
-            const b = socketIdArray.map(e => ({ id: e, pc: pcControl.createPc(e), stream: new MediaStream(), type: 'remote video', sendOffer: true }))
+            const b = socketIdArray.map(id => {
+              const stream = new MediaStream()
+              const pc = pcControl.createPc(id, stream)
+              return { id, pc, stream, type: 'remote video', sendOffer: true }
+            })
             b.unshift({ id: socket.id, type: 'local-video', stream: videoControl.getLocalVideoStream() })
             setTimeout(() =>
               setVideos(b), 2000)
@@ -77,7 +79,7 @@ export default function Main (props) {
           break
       }
     } else {
-      if (room === false) { window.alert('Room is fullyBooked') } else { /* videoControl.disableRemoteVideo(); videoControl.disableLocalVideo() */ }
+      if (room === false) { window.alert('Room is fullyBooked') }
     }
   }, [room])
   //

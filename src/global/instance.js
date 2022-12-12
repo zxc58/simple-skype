@@ -75,7 +75,7 @@ export const socketOn = {
 // pc
 export const pcControl = {
   adapter: new Map(),
-  createPc: function (id) {
+  createPc: function (id, MediaStream) {
     const configuration = {
       iceServers: [{
         urls: 'stun:stun.l.google.com:19302' // Google's public STUN server
@@ -84,8 +84,7 @@ export const pcControl = {
     const pc = new RTCPeerConnection(configuration)
     this.adapter.set(id, pc)
     pc.ontrack = ({ track }) => {
-      const a = document.getElementById(id)
-      if (track && a.srcObject) { a.srcObject.addTrack(track) }
+      if (track && MediaStream) { MediaStream.addTrack(track) }
     }
     videoControl.getLocalVideoStream().getTracks().forEach(track => {
       pc.addTrack(track)

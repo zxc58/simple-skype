@@ -13,8 +13,8 @@ export default function Video (props) {
         video.srcObject = stream
       }
     } else if (pc) { // type === 'remote video'
-      if (pc.remoteDescription) { video.srcObject = stream; return }
-      if (sendOffer) {
+      video.srcObject = stream
+      if (!pc.remoteDescription && sendOffer) {
         pcControl.createSignal({ pc, recipientId: id, senderId: socket.id, type: 'Offer' })
       }
     }
